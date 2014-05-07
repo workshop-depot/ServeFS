@@ -1,43 +1,39 @@
-﻿module Program
+﻿/// this file contains the implementation of the Windows Service
+/// Servo would take care of installing/uninstalling and starting/stopping the service
+
+module Service
 
 open System
 open System.Threading
-open System.ServiceProcess
 open System.Diagnostics
-open System.Collections
-open System.ComponentModel
-open System.Configuration.Install
-open Microsoft.FSharp.Data.UnitSystems.SI.UnitSymbols
+open System.ServiceProcess
 
 open Servo
 
-// *** SAMPLE.begin *** 
-// this part can be placed in a separate file/module
-
-Conf.ServiceName <- "SampleService"
-Conf.DisplayName <- "Sample Service Display Name"
-Conf.Description <- "Sample Service Description"
+Conf.ServiceName <- "$safeprojectname$"
+Conf.DisplayName <- "$safeprojectname$ Display Name"
+Conf.Description <- "$safeprojectname$ Description"
 
 /// separating implementations lets us debugging it as a console application
-type SampleServiceImp () =
+type $safeprojectname$Logic () =
     let stopped = new ManualResetEvent(false)
 
     member x.OnStart (args: String[]) = 
-        Trace.WriteLine("Sample Service Implementation: OnStart (running...)")
-
+        Trace.WriteLine("$safeprojectname$ Implementation: OnStart (running...)")
+        // this does nothing but waiting for OnStop triggered
         async {
             stopped.WaitOne() |> ignore
         } |> Async.Start
 
     member x.OnStop () = 
-        Trace.WriteLine("Sample Service Implementation: OnStop")
+        Trace.WriteLine("$safeprojectname$ Implementation: OnStop")
         stopped.Set() |> ignore
         Trace.Flush()
 
-type Composed () =
+type $safeprojectname$Class () =
     inherit ServiceBase()
 
-    let imp = new SampleServiceImp()
+    let imp = new $safeprojectname$Logic()
     do
         base.ServiceName <- Conf.ServiceName
         base.CanHandlePowerEvent <- false
@@ -48,16 +44,10 @@ type Composed () =
         base.AutoLog <- true
 
     override x.OnStart (args: String[]) =
+        //additional technical things like
         //base.RequestAdditionalTime(1000 * 60 * 3)
         imp.OnStart (args)
 
     override x.OnStop() =
-        //base.RequestAdditionalTime(1000 * 60 * 3)
+        //base.RequestAdditionalTime(...)
         imp.OnStop()
-
-// *** SAMPLE.end *** 
-
-[<EntryPoint>]
-let main (argv: String[]) = 
-    Toolbox.Runner(new Composed())
-    0 

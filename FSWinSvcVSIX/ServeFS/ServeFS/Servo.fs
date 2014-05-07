@@ -1,7 +1,6 @@
 ﻿namespace Servo
 
 open System
-open System.Threading
 open System.ServiceProcess
 open System.Diagnostics
 open System.Collections
